@@ -14,7 +14,6 @@ def get_index():
 def generate():
     data = request.json
     graph = DG.ProbGraph(node_num=int(data['N']), edge_num=int(data['E']))
-    print("graph", type(graph))
     return json.dumps(graph.__dict__)
 
 @app.route('/add', methods=['POST'])
