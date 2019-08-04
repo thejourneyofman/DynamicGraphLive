@@ -2,7 +2,7 @@
 from flask import Flask, Response, request, render_template, abort
 import json
 import random
-from src.DynamicGraph import DynamicGraph as DG
+from DynamicGraph import DynamicGraph as DG
 
 app = Flask(__name__)
 

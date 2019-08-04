@@ -95,6 +95,9 @@ jQuery(function ($) {
 
     $('#graph-params-form').submit(function () {
 
+        $('.progress').css('display', 'block');
+        event.preventDefault();
+
         var typeName = $graphTypeInput.val(),
             type = dynamicGraph.types[typeName],
             data = {}
