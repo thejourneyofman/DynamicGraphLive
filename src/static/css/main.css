@@ -1,0 +1,62 @@
+#graph-container {
+  left: 100;
+  right: 0;
+  position: absolute;
+  background-color: #455660;
+  width: 75%;
+  height: 100%;
+}
+.sigma-edge {
+  stroke: #14191C;
+}
+.sigma-node {
+  fill: green;
+  stroke: #14191C;
+  stroke-width: 2px;
+}
+.sigma-node:hover {
+  fill: blue;
+}
+.muted {
+  fill-opacity: 0.1;
+  stroke-opacity: 0.1;
+}
+
+h1 a {
+    background: url(../img/dgraph.png) no-repeat;
+    width: 300px;
+    height: 150px;
+    display: block;
+    white-space: nowrap;
+    text-indent: 100%;
+    overflow: hidden;
+}
+
+#social {
+    margin-top: 0.2em;
+    text-align: center;
+}
+
+.social-list {
+    display: inline-block;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    text-align: left;
+    vertical-align: bottom;
+}
+
+.social-list .twitter {
+    float: left;
+    width: 100px;
+    height: 30px;
+    overflow:hidden;
+}
+
+.social-list .facebook {
+    float: left;
+    width: 120px;
+    height: 25px;
+    line-height: 20px;
+    overflow: hidden;
+}

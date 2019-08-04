@@ -1,0 +1,49 @@
+# An interactive Live UI to generate a dynamic graph
+
+Create virtuaenv for python3.
+
+After creation go to the working directory and activate the virtual env created.
+
+Now run command:
+
+```
+pip install -r requirements.txt
+```
+
+In order to start the application,
+
+```python
+python app.py
+```
+
+In the browser, open the link.
+
+http://127.0.0.1:8080
+
+Thats it, enjoy the application.
+
+Deploy to heroku
+
+add Procfile
+
+web: gunicorn src.app:app --log-file=-
+
+Install the Heroku CLI
+Download and install the Heroku CLI.
+
+If you haven't already, log in to your Heroku account and follow the prompts to create a new SSH public key.
+
+$ heroku login
+Create a new Git repository
+Initialize a git repository in a new or existing directory
+
+$ cd [my-project]/
+$ git init
+$ heroku git:remote -a [my-project]
+Deploy your application
+Commit your code to the repository and deploy it to Heroku using Git.
+
+$ git add .
+$ git commit -am "make it better"
+$ git push heroku master
+

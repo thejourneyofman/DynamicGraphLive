@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/bootstrap.min.css')}}" media="all">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/main.css')}}" media="all">
+    <!-- START SIGMA IMPORTS -->
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/sigma.core.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/conrad.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/utils/sigma.utils.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/utils/sigma.polyfills.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/sigma.settings.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/classes/sigma.classes.dispatcher.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/classes/sigma.classes.configurable.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/classes/sigma.classes.graph.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/classes/sigma.classes.camera.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/classes/sigma.classes.quad.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/classes/sigma.classes.edgequad.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/captors/sigma.captors.mouse.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/captors/sigma.captors.touch.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/sigma.renderers.canvas.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/sigma.renderers.webgl.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/sigma.renderers.svg.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/sigma.renderers.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/webgl/sigma.webgl.nodes.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/webgl/sigma.webgl.nodes.fast.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/webgl/sigma.webgl.edges.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/webgl/sigma.webgl.edges.fast.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/webgl/sigma.webgl.edges.arrow.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.labels.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.hovers.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.nodes.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.edges.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.edges.curve.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.edges.arrow.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.edges.curvedArrow.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.edgehovers.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.edgehovers.curve.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.edgehovers.arrow.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/canvas/sigma.canvas.extremities.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/svg/sigma.svg.utils.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/svg/sigma.svg.nodes.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/svg/sigma.svg.edges.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/svg/sigma.svg.edges.curve.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/svg/sigma.svg.labels.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/renderers/svg/sigma.svg.hovers.def.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/middlewares/sigma.middlewares.rescale.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/middlewares/sigma.middlewares.copy.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/misc/sigma.misc.animation.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/misc/sigma.misc.bindEvents.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/misc/sigma.misc.bindDOMEvents.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/src/misc/sigma.misc.drawHovers.js')}}"></script>
+    <!-- END SIGMA IMPORTS -->
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/plugins/sigma.plugins.neighborhoods/sigma.plugins.neighborhoods.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/plugins/sigma.layout.forceAtlas2/supervisor.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/plugins/sigma.layout.forceAtlas2/worker.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/jquery-2.1.1.min.js')}}"></script>
+</head>
+<body >
+    <div class="content">
+      <div class="row" style="margin: 0;">
+        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+          <h1><a href="/">GraphG</a></h1>
+          <form id="graph-params-form" action="/" method="get">
+            <div class="form-group">
+              <label for="graph-type">Test Scenarios</label>
+              <select name="graph_type" class="form-control" id="graph-type">
+                  <option value="create_random_graph" selected>Generate Dynamic Graph</option>
+                  <option value="virus_screen_game">A Virus Screening Game</option>
+              </select>
+            </div>
+            <div id="params">
+              <div class="form-group">
+                <label for="dynamic_graph_n">Node Numbers</label>
+                <input name="N" type="number" class="form-control graph-param" id="dynamic_graph_n" placeholder="1〜2000" min="1" max="2000" step="1" value="200" required="required">
+              </div>
+              <div class="form-group">
+                <label for="dynamic_graph_e">Edge Numbers</label>
+                <input name="E" type="number" class="form-control graph-param" id="dynamic_graph_e" placeholder="1〜20000" min="1" max="20000" step="1" value="2000" required="required">
+              </div>
+              <div class="form-group">
+                <label for="dynamic_graph_l">New Node Numbers</label>
+                <input name="L" type="number" class="form-control graph-param" id="dynamic_graph_l" placeholder="1〜100" min="1" max="100" step="1" value="100" required="required">
+              </div>
+              <div class="form-group">
+                <label for="dynamic_graph_k">New Edge Numbers</label>
+                <input name="K" type="number" class="form-control graph-param" id="dynamic_graph_k" placeholder="1〜100" min="1" max="100" step="1" value="100" required="required">
+              </div>
+              <div class="form-group">
+                <label for="dynamic_graph_p">Initial Virus Number (Random)</label>
+                <input name="P" type="number" class="form-control graph-param" id="dynamic_graph_p" placeholder="1〜100" min="1" max="100" step="1" value="100" required="required">
+              </div>
+              <div class="form-group">
+                <label for="dynamic_graph_x">The Number To Be Removed</label>
+                <input name="X" type="number" class="form-control graph-param" id="dynamic_graph_x" placeholder="1〜100" min="1" max="100" step="1" value="100" required="required">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="generate-button" data-loading-text="Generate">Generate</button>
+            <button type="button" class="btn btn-primary" id="add-button" data-loading-text="Add">Add</button>
+            <button type="button" class="btn btn-primary" id="del-button" data-loading-text="Del">Delete</button>
+          </form>
+          <p id="github"><a href="https://github.com/thejourneyofman/DynamicGraph">&copy; 2019 Github </a></p>
+
+          <div id="social">
+            <div class="social-list">
+              <div class="facebook">
+                <div class="fb-like" data-href="https://github.com/thejourneyofman/DynamicGraph" data-width="450" data-show-faces="false" data-send="false" data-layout="button_count"></div>
+              </div>
+              <div class="twitter">
+                <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://github.com/thejourneyofman/DynamicGraph" data-lang="ja">Twitter</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="container">
+          <div id="graph-container"></div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="{{url_for('static', filename='js/main.js')}}"></script>
+    <script>
+      (function (w, d) {
+          var s, e = d.getElementsByTagName("script")[0],
+              a = function (u, i, delay) {
+                  if (!d.getElementById(i)) {
+                      s = d.createElement("script");
+                      s.src = u;
+                      if (i) {s.id = i;}
+                      e.parentNode.insertBefore(s, e);
+                  }
+              };
+          a("//platform.twitter.com/widgets.js", "twitter-wjs");
+          a("//connect.facebook.net/ja_JP/all.js#xfbml=1", "facebook-jssdk");
+      })(this, document);
+    </script>
+</body>
+</html>
+
+
+
