@@ -68,6 +68,23 @@ var graph = {};
         });
     };
 
+    // Function to reset the page
+    dynamicGraph.reset = function reset() {
+        // Get a reference to the 3 buttons
+        var upload_btn = document.getElementById("upload_btn");
+        var loading_btn = document.getElementById("loading_btn");
+        var cancel_btn = document.getElementById("cancel_btn");
+        // Hide the cancel button
+        cancel_btn.classList.add("d-none");
+        // Hide the loading button
+        loading_btn.classList.add("d-none");
+        // Hide the progress bar
+        progress_wrapper.classList.add("d-none");
+        // Reset the progress bar state
+        progress.setAttribute("style", `width: 0%`);
+
+    };
+
 })(jQuery);
 
 /* main */
@@ -106,25 +123,28 @@ jQuery(function ($) {
             var $input = $("#" + id);
             data[$input.attr('name')] = $input.val();
         });
+        var progress = document.getElementById("progress");
+        var progress_wrapper = document.getElementById("progress_wrapper");
+        var progress_status = document.getElementById("progress_status");
+        var source = new EventSource("/generate/"+data['N']);
+        source.onmessage = function(e) {
+             json  = JSON.parse(e.data);
+             dynamicGraph.plotGraph(svg, json);
+             graph = json;
 
-        $.ajax({
-            url:"/generate",
-            type:"POST",
-            cache: false,
-            data:JSON.stringify(data),
-            contentType:"application/json; charset=utf-8",
-            dataType:"json",
-            success: function (json) {
-                dynamicGraph.plotGraph(svg, json);
-                graph = json;
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                var json = $.parseJSON(xhr.responseText);
-                var errors = json.errors;
-            },
-            complete: function () {
+             if (Number(e.lastEventId) >= data['N'] ) {
+                source.close(); // stop retry
             }
-        });
+            // Get the loaded amount and total filesize (bytes)
+            var loaded = Number(e.lastEventId);
+            var total = data['N'];
+            // Calculate percent uploaded
+            var percent_complete = (loaded / total) * 100;
+            // Update the progress text and progress bar
+            progress.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
+            progress_status.innerText = `${Math.floor(percent_complete)}% uploaded`;
+        };
+
         return false;
     });
 

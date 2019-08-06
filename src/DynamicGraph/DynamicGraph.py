@@ -98,8 +98,8 @@ class ProbGraph():
             # Do the initialization
             #############################
             self._initialize(node_num)
-            self._createEdges(edge_num)
-            self.updateComponents()
+            #self._createEdges(edge_num)
+            #self.updateComponents()
 
         else:
             self.V = []
@@ -274,7 +274,8 @@ class ProbGraph():
         """
         self.connected_components = []
         for x in self._dfs_non_recursive(self.V):
-            print("visited", x)
+            #print("visited", x)
+            continue
 
         ##############################################
         # Recursive way fails at big data >= 200K nodes
@@ -358,7 +359,8 @@ class ProbGraph():
                 if len(component) <= 1:
                     continue
                 for x in self._dfs_non_recursive(component):
-                    print("visited", x)
+                    #print("visited", x)
+                    continue
                 p -= s
                 if len(tuple(p)) == 0:
                     break
