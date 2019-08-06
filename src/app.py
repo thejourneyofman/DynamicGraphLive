@@ -3,7 +3,7 @@ from flask import Flask, Response, request, render_template, abort
 import json
 import random
 import time
-from DynamicGraph import DynamicGraph as DG
+from src.DynamicGraph import DynamicGraph as DG
 
 app = Flask(__name__)
 subscriptions = []
@@ -56,7 +56,7 @@ def subscribe(node_number):
         x = 0
         subscriptions.append(x)
         init_num = int(node_number * 0.1)
-        interval = int(node_number * 0.01)
+        interval = int(node_number * 0.1)
         try:
             graph = DG.ProbGraph(node_num=init_num, edge_num=init_num * 10)
             while x < node_number:
