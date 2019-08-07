@@ -53,7 +53,6 @@ def get_index():
 def generate(node_number):
     def gen():
         x = 0
-
         init_num = int(node_number * 0.1)
         interval = int(node_number * 0.1)
         try:
@@ -68,43 +67,47 @@ def generate(node_number):
 
     return Response(gen(), mimetype="text/event-stream")
 
-#@app.route('/generate', methods=['POST'])
-#def generate():
-#    data = request.json
-#    graph = DG.ProbGraph(node_num=int(data['N']), edge_num=int(data['E']))
-#    return json.dumps(graph.__dict__)
+@app.route("/add/<string:graph>")
+def add(graph):
+    data = json.loads(graph)
+    def gen():
+        interval = int(int(data['L']) * 0.1)
+        if 'graph' in data.keys() and data['graph'] and 'V' in data['graph'].keys() and data['graph']['V']:
+            graph = DG.ProbGraph(node_num=0, edge_num=0, copy=True)
+            graph.V = data['graph']['V']
+            graph.E = data['graph']['E']
+            graph.connected_nodes = data['graph']['connected_nodes']
+            graph.connected_components = data['graph']['connected_components']
+            if isinstance(data['graph']['neighbours'], dict):
+                graph.neighbours = {int(k): v for k, v in data['graph']['neighbours'].items()}
+            if isinstance(data['graph']['neighbours'], list):
+                graph.neighbours = {int(k): v for k, v in enumerate(data['graph']['neighbours'])}
+            if isinstance(data['graph']['visited'], dict):
+                graph.visited = {int(k): v for k, v in data['graph']['visited'].items()}
+            if isinstance(data['graph']['visited'], list):
+                graph.visited = {int(k): v for k, v in enumerate(data['graph']['visited'])}
+            graph.source = data['graph']['source']
+            graph.isolated_nodes = data['graph']['isolated_nodes']
+            graph.copy = False
+            x = 0
+        else:
+            init_num = int(int(data['L']) * 0.1)
+            graph = DG.ProbGraph(node_num=init_num, edge_num=init_num * 10)
+            x = init_num
+        try:
+            while x < int(data['L']):
+                graph.addDynamic(interval, interval * 10)
+                x += interval
+                ev = ServerSentEvent(graph, x)
+                yield ev.encode()
+        except GeneratorExit:
+            raise Exception('Graph generation has been cancelled.')
 
-@app.route('/add', methods=['POST'])
-def add():
-    data = request.json
-    if 'graph' not in data.keys() or not data['graph']:
-        abort(404, {'message': 'You have to generate the graph first.'})
-    if 'result' in data['graph'].keys() and data['graph']['result'] == 404:
-        abort(404, {'message': 'You have to generate the graph first.'})
-
-    # Copy the dict to the ProbGraph
-    graph = DG.ProbGraph(node_num=0, edge_num=0, copy=True)
-    graph.V = data['graph']['V']
-    graph.E = data['graph']['E']
-    graph.connected_nodes = data['graph']['connected_nodes']
-    graph.connected_components = data['graph']['connected_components']
-    graph.neighbours = {int(k):v for k,v in enumerate(data['graph']['neighbours'])}
-    graph.visited =  {int(k):v for k,v in enumerate(data['graph']['visited'])}
-    graph.source = data['graph']['source']
-    graph.isolated_nodes = data['graph']['isolated_nodes']
-    graph.copy = False
-
-    try:
-        graph.addDynamic(int(data['L']), int(data['K']))
-    except Exception as e:
-        abort(404, {'message': e.args})
-
-    return json.dumps(graph.__dict__)
+    return Response(gen(), mimetype="text/event-stream")
 
 @app.route('/delete', methods=['POST'])
 def delete():
     data = request.json
-
     if 'graph' not in data.keys() or not data['graph']:
         abort(404, {'message': 'You have to generate the graph first.'})
     if 'result' in data['graph'].keys() and data['graph']['result'] == 404:
@@ -116,8 +119,14 @@ def delete():
     graph.E = [tuple(e) for e in data['graph']['E']]
     graph.connected_nodes = data['graph']['connected_nodes']
     graph.connected_components = data['graph']['connected_components']
-    graph.neighbours = {int(k):v for k,v in data['graph']['neighbours'].items()}
-    graph.visited =  {int(k):v for k,v in data['graph']['visited'].items()}
+    if isinstance(data['graph']['neighbours'], dict):
+        graph.neighbours = {int(k): v for k, v in data['graph']['neighbours'].items()}
+    if isinstance(data['graph']['neighbours'], list):
+        graph.neighbours = {int(k): v for k, v in enumerate(data['graph']['neighbours'])}
+    if isinstance(data['graph']['visited'], dict):
+        graph.visited = {int(k): v for k, v in data['graph']['visited'].items()}
+    if isinstance(data['graph']['visited'], list):
+        graph.visited = {int(k): v for k, v in enumerate(data['graph']['visited'])}
     graph.source = data['graph']['source']
     graph.isolated_nodes = data['graph']['isolated_nodes']
     graph.copy = False

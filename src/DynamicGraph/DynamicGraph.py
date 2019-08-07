@@ -341,7 +341,11 @@ class ProbGraph():
             self.V.remove(v)
             self.connected_nodes[:] = (value for value in self.connected_nodes if value != v)
             self.isolated_nodes[:] = (value for value in self.isolated_nodes if value != v)
+            print("v", v)
+            print("self.neighbours[v]", self.neighbours[v])
             for n in self.neighbours[v]:
+                print("n",n)
+                print("self.connected_nodes", self.connected_nodes)
                 self.connected_nodes.remove(n)
                 self.neighbours[n].remove(v)
                 if (n, v) in self.E:

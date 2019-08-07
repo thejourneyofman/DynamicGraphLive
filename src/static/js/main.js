@@ -162,11 +162,11 @@ jQuery(function ($) {
           // Get the loaded amount and total filesize (bytes)
           var loaded = Number(e.lastEventId);
           var total = data['N'];
-          // Calculate percent uploaded
+          // Calculate percent completed
           var percent_complete = (loaded / total) * 100;
           // Update the progress text and progress bar
           progress.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
-          progress_status.innerText = `${Math.floor(percent_complete)}% uploaded`;
+          progress_status.innerText = `${Math.floor(percent_complete)}% completed`;
 
         }, false);
 
@@ -198,26 +198,50 @@ jQuery(function ($) {
             var $input = $("#" + id);
             data[$input.attr('name')] = $input.val();
         });
-        data['graph'] = graph;
 
-        $.ajax({
-            url:"/add",
-            type:"POST",
-            cache: false,
-            data:JSON.stringify(data),
-            contentType:"application/json; charset=utf-8",
-            dataType:"json",
-            success: function (json) {
-                dynamicGraph.plotGraph(svg, json);
-                graph = json;
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                var json = $.parseJSON(xhr.responseText);
-                var errors = json.errors;
-            },
-            complete: function () {
-            }
-        });
+        data['graph'] = graph;
+        console.log("data",data);
+
+        if (!!window.EventSource) {
+          var source = new EventSource("/add/"+JSON.stringify(data));
+        }
+
+        source.addEventListener('message', function(e) {
+          console.log("message", e);
+          json  = JSON.parse(e.data);
+          dynamicGraph.plotGraph(svg, json);
+          graph = json;
+
+          if (Number(e.lastEventId) >= data['N'] ) {
+             dynamicGraph.show_alert(`Generation Complete.`, "success");
+             source.close(); // stop retry
+          }
+          // Get the loaded amount and total filesize (bytes)
+          var loaded = Number(e.lastEventId);
+          var total = data['N'];
+          // Calculate percent completed
+          var percent_complete = (loaded / total) * 100;
+          // Update the progress text and progress bar
+          progress.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
+          progress_status.innerText = `${Math.floor(percent_complete)}% completed`;
+
+        }, false);
+
+        // error handler
+        source.addEventListener("error", function (e) {
+          dynamicGraph.reset();
+          if (e.readyState == EventSource.CLOSED) {
+            dynamicGraph.show_alert(`Error generating graph`, "warning");
+          }
+        }, false);
+
+        // abort handler
+        cancel_btn.addEventListener("click", function (e) {
+           dynamicGraph.show_alert(`Generation cancelled`, "danger");
+           dynamicGraph.reset();
+           source.close();
+        }, false);
+
         return false;
     });
 
