@@ -3,7 +3,7 @@ from flask import Flask, Response, request, render_template, abort
 import json
 import random
 import time
-from DynamicGraph import DynamicGraph as DG
+from src.DynamicGraph import DynamicGraph as DG
 
 app = Flask(__name__)
 
@@ -15,7 +15,7 @@ class ServerSentEvent(object):
         self.desc_map = {
             self.data : 'data',
             self.event : 'event',
-            self.event_id : 'event_id'
+            self.event_id : 'id'
         }
     def encode(self):
         if not self.data:
@@ -62,8 +62,8 @@ def generate(node_number):
                 x = len(graph.V) + interval
                 ev = ServerSentEvent(graph, x)
                 yield ev.encode()
-        except GeneratorExit as e:
-            abort(404, {'message': e.args})
+        except GeneratorExit:
+            abort(404, {'message': 'Graph generation cancelled.'})
 
     return Response(gen(), mimetype="text/event-stream")
 

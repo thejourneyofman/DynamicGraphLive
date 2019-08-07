@@ -84,10 +84,29 @@ var graph = {};
 
     };
 
+    // Function to show alerts
+    dynamicGraph.show_alert = function show_alert(message, alert) {
+      // Get a reference to the alert wrapper
+      var alert_wrapper = document.getElementById("alert_wrapper");
+      alert_wrapper.innerHTML = `
+        <div id="alert" class="alert alert-${alert} alert-dismissible fade show" role="alert">
+          <span>${message}</span>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      `
+    };
+
 })(jQuery);
 
 /* main */
 jQuery(function ($) {
+
+    var progress = document.getElementById("progress");
+    var progress_wrapper = document.getElementById("progress_wrapper");
+    var progress_status = document.getElementById("progress_status");
+
     // Instantiate sigma:
     var svg = new sigma({
       graph: dynamicGraph,
@@ -122,27 +141,44 @@ jQuery(function ($) {
             var $input = $("#" + id);
             data[$input.attr('name')] = $input.val();
         });
-        var progress = document.getElementById("progress");
-        var progress_wrapper = document.getElementById("progress_wrapper");
-        var progress_status = document.getElementById("progress_status");
-        var source = new EventSource("/generate/"+data['N']);
-        source.onmessage = function(e) {
-             json  = JSON.parse(e.data);
-             dynamicGraph.plotGraph(svg, json);
-             graph = json;
 
-             if (Number(e.lastEventId) >= data['N'] ) {
-                source.close(); // stop retry
-            }
-            // Get the loaded amount and total filesize (bytes)
-            var loaded = Number(e.lastEventId);
-            var total = data['N'];
-            // Calculate percent uploaded
-            var percent_complete = (loaded / total) * 100;
-            // Update the progress text and progress bar
-            progress.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
-            progress_status.innerText = `${Math.floor(percent_complete)}% uploaded`;
-        };
+        if (!!window.EventSource) {
+          var source = new EventSource("/generate/"+data['N']);
+        }
+
+        source.addEventListener('message', function(e) {
+          json  = JSON.parse(e.data);
+          dynamicGraph.plotGraph(svg, json);
+          graph = json;
+
+          if (Number(e.lastEventId) >= data['N'] ) {
+             source.close(); // stop retry
+          }
+          // Get the loaded amount and total filesize (bytes)
+          var loaded = Number(e.lastEventId);
+          var total = data['N'];
+          // Calculate percent uploaded
+          var percent_complete = (loaded / total) * 100;
+          // Update the progress text and progress bar
+          progress.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
+          progress_status.innerText = `${Math.floor(percent_complete)}% uploaded`;
+
+        }, false);
+
+        // error handler
+        source.addEventListener("error", function (e) {
+          dynamicGraph.reset();
+          if (e.readyState == EventSource.CLOSED) {
+            dynamicGraph.show_alert(`Error generating graph`, "warning");
+          }
+        }, false);
+
+        // abort handler
+        cancel_btn.addEventListener("click", function () {
+           dynamicGraph.reset();
+           dynamicGraph.show_alert(`Generation cancelled`, "primary");
+           source.close();
+        }, false);
 
         return false;
     });
