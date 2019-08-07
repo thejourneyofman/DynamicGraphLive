@@ -200,7 +200,6 @@ jQuery(function ($) {
         });
 
         data['graph'] = graph;
-        console.log("data",data);
 
         if (!!window.EventSource) {
           var source = new EventSource("/add/"+JSON.stringify(data));
