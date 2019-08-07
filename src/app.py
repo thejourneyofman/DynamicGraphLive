@@ -8,14 +8,14 @@ from DynamicGraph import DynamicGraph as DG
 app = Flask(__name__)
 
 class ServerSentEvent(object):
-    def __init__(self, data, id):
+    def __init__(self, data, event_id):
         self.data = data
         self.event = None
-        self.id = id
+        self.event_id = event_id
         self.desc_map = {
             self.data : 'data',
             self.event : 'event',
-            self.id : 'id'
+            self.event_id : 'event_id'
         }
     def encode(self):
         if not self.data:
