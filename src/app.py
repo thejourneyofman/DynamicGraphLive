@@ -3,10 +3,9 @@ from flask import Flask, Response, request, render_template, abort
 import json
 import random
 import time
-from src.DynamicGraph import DynamicGraph as DG
+from DynamicGraph import DynamicGraph as DG
 
 app = Flask(__name__)
-subscriptions = []
 
 class ServerSentEvent(object):
     def __init__(self, data, id):
@@ -51,10 +50,9 @@ def get_index():
     return render_template('index.html')
 
 @app.route("/generate/<int:node_number>")
-def subscribe(node_number):
+def generate(node_number):
     def gen():
         x = 0
-        subscriptions.append(x)
         init_num = int(node_number * 0.1)
         interval = int(node_number * 0.1)
         try:
@@ -64,8 +62,8 @@ def subscribe(node_number):
                 x = len(graph.V) + interval
                 ev = ServerSentEvent(graph, x)
                 yield ev.encode()
-        except GeneratorExit: # Or maybe use flask signals
-            subscriptions.remove(x)
+        except GeneratorExit as e:
+            abort(404, {'message': e.args})
 
     return Response(gen(), mimetype="text/event-stream")
 
