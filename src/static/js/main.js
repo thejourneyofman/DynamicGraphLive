@@ -70,9 +70,10 @@ var graph = {};
 
     // Function to reset the page
     dynamicGraph.reset = function reset() {
-        // Get a reference to the 2 buttons
         var loading_btn = document.getElementById("loading_btn");
         var cancel_btn = document.getElementById("cancel_btn");
+        var progress_wrapper = document.getElementById("progress_wrapper");
+        var progress_status = document.getElementById("progress_status");
         // Hide the cancel button
         cancel_btn.classList.add("d-none");
         // Hide the loading button
@@ -89,9 +90,9 @@ var graph = {};
       // Get a reference to the alert wrapper
       var alert_wrapper = document.getElementById("alert_wrapper");
       alert_wrapper.innerHTML = `
-        <div id="alert" class="alert alert-${alert} alert-dismissible fade show" role="alert">
+        <div id="alert" class="alert alert-${alert} alert-dismissible show" role="alert">
           <span>${message}</span>
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -106,6 +107,8 @@ jQuery(function ($) {
     var progress = document.getElementById("progress");
     var progress_wrapper = document.getElementById("progress_wrapper");
     var progress_status = document.getElementById("progress_status");
+    var loading_btn = document.getElementById("loading_btn");
+    var cancel_btn = document.getElementById("cancel_btn");
 
     // Instantiate sigma:
     var svg = new sigma({
@@ -129,7 +132,7 @@ jQuery(function ($) {
     });
 
     $('#graph-params-form').submit(function () {
-
+        dynamicGraph.reset();
         $('.progress').css('display', 'block');
         event.preventDefault();
 
@@ -147,11 +150,13 @@ jQuery(function ($) {
         }
 
         source.addEventListener('message', function(e) {
+          console.log("message", e);
           json  = JSON.parse(e.data);
           dynamicGraph.plotGraph(svg, json);
           graph = json;
 
           if (Number(e.lastEventId) >= data['N'] ) {
+             dynamicGraph.show_alert(`Generation Complete.`, "success");
              source.close(); // stop retry
           }
           // Get the loaded amount and total filesize (bytes)
@@ -174,9 +179,9 @@ jQuery(function ($) {
         }, false);
 
         // abort handler
-        cancel_btn.addEventListener("click", function () {
+        cancel_btn.addEventListener("click", function (e) {
+           dynamicGraph.show_alert(`Generation cancelled`, "danger");
            dynamicGraph.reset();
-           dynamicGraph.show_alert(`Generation cancelled`, "primary");
            source.close();
         }, false);
 

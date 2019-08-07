@@ -53,6 +53,7 @@ def get_index():
 def generate(node_number):
     def gen():
         x = 0
+
         init_num = int(node_number * 0.1)
         interval = int(node_number * 0.1)
         try:
@@ -63,7 +64,7 @@ def generate(node_number):
                 ev = ServerSentEvent(graph, x)
                 yield ev.encode()
         except GeneratorExit:
-            abort(404, {'message': 'Graph generation cancelled.'})
+            raise Exception('Graph generation has been cancelled.')
 
     return Response(gen(), mimetype="text/event-stream")
 
