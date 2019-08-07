@@ -70,8 +70,7 @@ var graph = {};
 
     // Function to reset the page
     dynamicGraph.reset = function reset() {
-        // Get a reference to the 3 buttons
-        var upload_btn = document.getElementById("upload_btn");
+        // Get a reference to the 2 buttons
         var loading_btn = document.getElementById("loading_btn");
         var cancel_btn = document.getElementById("cancel_btn");
         // Hide the cancel button
