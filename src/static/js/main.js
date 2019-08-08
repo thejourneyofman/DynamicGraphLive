@@ -1,6 +1,5 @@
 /* utility */
 var dynamicGraph = {};
-var graph = {};
 (function ($) {
     dynamicGraph.types = {
         create_random_graph: {
@@ -20,6 +19,51 @@ var graph = {};
         node.setAttributeNS(null, 'class', node.getAttribute('class').replace(/(\s|^)muted(\s|$)/g, '$2'));
     };
 
+    dynamicGraph.request = function (svg, action_type, nodes_number) {
+
+        if (!!window.EventSource && action_type == "new") {
+          var source = new EventSource("/generate/" + action_type + "/" + nodes_number);
+        }
+
+        if (!!window.EventSource && action_type == "add") {
+          var source = new EventSource("/generate/" + action_type + "/" + nodes_number);
+        }
+
+        source.addEventListener('message', function(e) {
+          json  = JSON.parse(e.data);
+          dynamicGraph.plotGraph(svg, json);
+
+          if (Number(e.lastEventId) >= nodes_number ) {
+             dynamicGraph.show_alert(`Generation Complete.`, "success");
+             source.close(); // stop retry
+          }
+          // Get the loaded amount and total filesize (bytes)
+          var loaded = Number(e.lastEventId);
+          var total = nodes_number;
+          // Calculate percent completed
+          var percent_complete = (loaded / total) * 100;
+          // Update the progress text and progress bar
+          progress.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
+          progress_status.innerText = `${Math.floor(percent_complete)}% completed`;
+
+        }, false);
+
+        // error handler
+        source.addEventListener("error", function (e) {
+          dynamicGraph.reset();
+          if (e.readyState == EventSource.CLOSED) {
+            dynamicGraph.show_alert(`Error generating graph`, "warning");
+          }
+        }, false);
+
+        // abort handler
+        cancel_btn.addEventListener("click", function (e) {
+           dynamicGraph.show_alert(`Generation cancelled`, "danger");
+           dynamicGraph.reset();
+           source.close();
+        }, false);
+    };
+
     dynamicGraph.plotGraph = function (svg, json) {
         console.log("json", json);
         if (json.result == 404) {
@@ -27,17 +71,18 @@ var graph = {};
             return true;
         };
         svg.graph.clear();
-        var nodes = $.map(json.V, function (v, i) {
+
+        var nodes = json.V.reduce((acc, current, index) => {
             node = {};
-            node.id = v;
-            node.label = 'Node ' + v;
+            node.id = current;
+            node.label = 'Node ' + current;
             node.x = Math.random();
             node.y = Math.random();
-            node.size = Math.random();
+            node.size = json.neighbours[index].length;
             node.color = '#666';
             svg.graph.addNode(node);
             return node;
-        });
+        }, [])
 
         var edges = $.map(json.E, function (e, i) {
             edge = {};
@@ -145,45 +190,7 @@ jQuery(function ($) {
             data[$input.attr('name')] = $input.val();
         });
 
-        if (!!window.EventSource) {
-          var source = new EventSource("/generate/"+data['N']);
-        }
-
-        source.addEventListener('message', function(e) {
-          console.log("message", e);
-          json  = JSON.parse(e.data);
-          dynamicGraph.plotGraph(svg, json);
-          graph = json;
-
-          if (Number(e.lastEventId) >= data['N'] ) {
-             dynamicGraph.show_alert(`Generation Complete.`, "success");
-             source.close(); // stop retry
-          }
-          // Get the loaded amount and total filesize (bytes)
-          var loaded = Number(e.lastEventId);
-          var total = data['N'];
-          // Calculate percent completed
-          var percent_complete = (loaded / total) * 100;
-          // Update the progress text and progress bar
-          progress.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
-          progress_status.innerText = `${Math.floor(percent_complete)}% completed`;
-
-        }, false);
-
-        // error handler
-        source.addEventListener("error", function (e) {
-          dynamicGraph.reset();
-          if (e.readyState == EventSource.CLOSED) {
-            dynamicGraph.show_alert(`Error generating graph`, "warning");
-          }
-        }, false);
-
-        // abort handler
-        cancel_btn.addEventListener("click", function (e) {
-           dynamicGraph.show_alert(`Generation cancelled`, "danger");
-           dynamicGraph.reset();
-           source.close();
-        }, false);
+        dynamicGraph.request(svg, "new", Number(data['N']));
 
         return false;
     });
@@ -199,47 +206,12 @@ jQuery(function ($) {
             data[$input.attr('name')] = $input.val();
         });
 
-        data['graph'] = graph;
-
-        if (!!window.EventSource) {
-          var source = new EventSource("/add/"+JSON.stringify(data));
+        if (Number(data['L']) < 50) {
+            dynamicGraph.show_alert(`Numbers Of New Nodes Must Be Greater Than 50`, "warning");
+            return;
         }
 
-        source.addEventListener('message', function(e) {
-          console.log("message", e);
-          json  = JSON.parse(e.data);
-          dynamicGraph.plotGraph(svg, json);
-          graph = json;
-
-          if (Number(e.lastEventId) >= data['N'] ) {
-             dynamicGraph.show_alert(`Generation Complete.`, "success");
-             source.close(); // stop retry
-          }
-          // Get the loaded amount and total filesize (bytes)
-          var loaded = Number(e.lastEventId);
-          var total = data['N'];
-          // Calculate percent completed
-          var percent_complete = (loaded / total) * 100;
-          // Update the progress text and progress bar
-          progress.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
-          progress_status.innerText = `${Math.floor(percent_complete)}% completed`;
-
-        }, false);
-
-        // error handler
-        source.addEventListener("error", function (e) {
-          dynamicGraph.reset();
-          if (e.readyState == EventSource.CLOSED) {
-            dynamicGraph.show_alert(`Error generating graph`, "warning");
-          }
-        }, false);
-
-        // abort handler
-        cancel_btn.addEventListener("click", function (e) {
-           dynamicGraph.show_alert(`Generation cancelled`, "danger");
-           dynamicGraph.reset();
-           source.close();
-        }, false);
+        dynamicGraph.request(svg, "add", Number(data['L']));
 
         return false;
     });
@@ -254,7 +226,6 @@ jQuery(function ($) {
             var $input = $("#" + id);
             data[$input.attr('name')] = $input.val();
         });
-        data['graph'] = graph;
 
         $.ajax({
             url:"/delete",
@@ -265,7 +236,6 @@ jQuery(function ($) {
             dataType:"json",
             success: function (json) {
                 dynamicGraph.plotGraph(svg, json);
-                graph = json;
             },
             error: function (xhr, textStatus, errorThrown) {
                 var json = $.parseJSON(xhr.responseText);
