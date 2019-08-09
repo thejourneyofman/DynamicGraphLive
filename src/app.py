@@ -26,14 +26,14 @@ class ServerSentEvent(object):
         graph_map = {
             str(self.data.V): 'V',
             str([list(row) for row in self.data.E]): 'E',
-            str(self.data.connected_components): 'connected_components',
-            str(self.data.connected_nodes): 'connected_nodes',
-            str(self.data.gamma): 'gamma',
-            str(self.data.isolated_nodes): 'isolated_nodes',
+            #str(self.data.connected_components): 'connected_components',
+            #str(self.data.connected_nodes): 'connected_nodes',
+            #str(self.data.gamma): 'gamma',
+            #str(self.data.isolated_nodes): 'isolated_nodes',
             str(list(self.data.neighbours.values())): 'neighbours',
-            str(self.data.source): 'source',
-            str(self.data.temp_component): 'temp_component',
-            str(list(self.data.visited.values())): 'visited'
+            #str(self.data.source): 'source',
+            #str(self.data.temp_component): 'temp_component',
+            #str(list(self.data.visited.values())): 'visited'
         }
         for k, v in self.desc_map.items():
             if v == 'data':
@@ -51,7 +51,7 @@ def get_index():
     graph_gen.clear()
     return render_template('index.html')
 
-@app.route("/generate/<string:action_type>/<int:node_number>")
+@app.route("/api/<string:action_type>/<int:node_number>")
 def generate(action_type, node_number):
     def gen():
         if action_type == "add" and graph_gen:

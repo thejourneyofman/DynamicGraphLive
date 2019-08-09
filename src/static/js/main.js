@@ -22,11 +22,11 @@ var dynamicGraph = {};
     dynamicGraph.request = function (svg, action_type, nodes_number) {
 
         if (!!window.EventSource && action_type == "new") {
-          var source = new EventSource("/generate/" + action_type + "/" + nodes_number);
+          var source = new EventSource("/api/" + action_type + "/" + nodes_number);
         }
 
         if (!!window.EventSource && action_type == "add") {
-          var source = new EventSource("/generate/" + action_type + "/" + nodes_number);
+          var source = new EventSource("/api/" + action_type + "/" + nodes_number);
         }
 
         source.addEventListener('message', function(e) {
@@ -228,12 +228,12 @@ jQuery(function ($) {
         });
 
         $.ajax({
-            url:"/delete",
-            type:"POST",
+            url: endpoint + "/delete",
+            type: "POST",
             cache: false,
-            data:JSON.stringify(data),
-            contentType:"application/json; charset=utf-8",
-            dataType:"json",
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
             success: function (json) {
                 dynamicGraph.plotGraph(svg, json);
             },

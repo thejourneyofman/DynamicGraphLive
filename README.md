@@ -1,4 +1,4 @@
-# An interactive Live UI to generate a Large Scale Free Graph
+# An interactive Live UI to generate a Scale Free Graph
 
 # [New featuress]
 1, Using sigma.JS rather than D3 JS now supports larger graph with nodes up to 50K.
