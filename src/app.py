@@ -3,7 +3,7 @@ from flask import Flask, Response, request, render_template, abort
 import json
 import random
 import time
-from src.DynamicGraph import DynamicGraph as DG
+from DynamicGraph import DynamicGraph as DG
 
 app = Flask(__name__)
 graph_gen = []
