@@ -1,5 +1,6 @@
 /* utility */
 var dynamicGraph = {};
+var endpoint = "https://dynamicgraph.herokuapp.com";
 (function ($) {
     dynamicGraph.types = {
         create_random_graph: {
@@ -22,11 +23,11 @@ var dynamicGraph = {};
     dynamicGraph.request = function (svg, action_type, nodes_number) {
 
         if (!!window.EventSource && action_type == "new") {
-          var source = new EventSource("/api/" + action_type + "/" + nodes_number);
+          var source = new EventSource(endpoint + "/api/" + action_type + "/" + nodes_number);
         }
 
         if (!!window.EventSource && action_type == "add") {
-          var source = new EventSource("/api/" + action_type + "/" + nodes_number);
+          var source = new EventSource(endpoint + "/api/" + action_type + "/" + nodes_number);
         }
 
         source.addEventListener('message', function(e) {

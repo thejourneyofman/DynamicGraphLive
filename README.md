@@ -1,8 +1,9 @@
 # An interactive Live UI to generate a Scale Free Graph
 
-# [New featuress]
-1, Using sigma.JS rather than D3 JS now supports larger graph with nodes up to 50K.
-2, It now generates the graph dynamically and update in a real-time manner
+#  New featuress
+1, Using sigma.JS rather than D3 JS now supports larger graph with nodes up to 50K on local and 5K on cloud.
+2, It now generates the graph dynamically and update in a real-time manner.
+3, It now adds and removes nodes in a dynamic way.
 
 [A Live DEMO](https://dynamicgraph.herokuapp.com)
 
