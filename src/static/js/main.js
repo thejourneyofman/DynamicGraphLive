@@ -1,6 +1,5 @@
 /* utility */
 var dynamicGraph = {};
-var endpoint = "https://dynamicgraph.herokuapp.com";
 (function ($) {
     dynamicGraph.types = {
         create_random_graph: {
@@ -23,11 +22,11 @@ var endpoint = "https://dynamicgraph.herokuapp.com";
     dynamicGraph.request = function (svg, action_type, nodes_number) {
 
         if (!!window.EventSource && action_type == "new") {
-          var source = new EventSource(endpoint + "/api/" + action_type + "/" + nodes_number);
+          var source = new EventSource("/api/" + action_type + "/" + nodes_number);
         }
 
         if (!!window.EventSource && action_type == "add") {
-          var source = new EventSource(endpoint + "/api/" + action_type + "/" + nodes_number);
+          var source = new EventSource("/api/" + action_type + "/" + nodes_number);
         }
 
         source.addEventListener('message', function(e) {
@@ -229,7 +228,7 @@ jQuery(function ($) {
         });
 
         $.ajax({
-            url: endpoint + "/delete",
+            url: "/delete",
             type: "POST",
             cache: false,
             data: JSON.stringify(data),
