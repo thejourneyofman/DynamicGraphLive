@@ -80,6 +80,7 @@ def generate(action_type, node_number):
                 yield ev.encode()
             graph_gen.append(graph)
         except GeneratorExit:
+            print("exit")
             if graph_gen:
                 graph_gen.clear()
             raise Exception
