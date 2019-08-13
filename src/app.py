@@ -57,6 +57,7 @@ def get_index():
 @app.route('/api/<string:action_type>/<int:node_number>')
 def generate(action_type, node_number):
     def gen():
+        print(graph_gen)
         if action_type == 'add_poison' and not graph_gen:
             raise Exception
         elif action_type in ['add_nodes', 'add_poison' ] and graph_gen:
