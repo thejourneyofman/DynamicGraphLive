@@ -3,7 +3,7 @@ from flask import Flask, Response, request, render_template, abort
 import json
 import random
 import time
-from src.DynamicGraph import DynamicGraph as DG
+from PoisonGrapn import *
 
 app = Flask(__name__)
 graph_gen = []
@@ -26,11 +26,14 @@ class ServerSentEvent(object):
         graph_map = {
             str(self.data.V): 'V',
             str([list(row) for row in self.data.E]): 'E',
-            #str(self.data.connected_components): 'connected_components',
-            #str(self.data.connected_nodes): 'connected_nodes',
-            #str(self.data.gamma): 'gamma',
-            #str(self.data.isolated_nodes): 'isolated_nodes',
             str(list(self.data.neighbours.values())): 'neighbours',
+            str(self.data.Principals): 'Principals',
+            str(self.data.deletedNodes): 'deletedNodes',
+            str(self.data.PoisonNodes): 'PoisonNodes'
+            # str(self.data.connected_components): 'connected_components',
+            # str(self.data.connected_nodes): 'connected_nodes',
+            # str(self.data.gamma): 'gamma',
+            # str(self.data.isolated_nodes): 'isolated_nodes',
             #str(self.data.source): 'source',
             #str(self.data.temp_component): 'temp_component',
             #str(list(self.data.visited.values())): 'visited'
@@ -51,21 +54,26 @@ def get_index():
     graph_gen.clear()
     return render_template('index.html')
 
-@app.route("/api/<string:action_type>/<int:node_number>")
+@app.route('/api/<string:action_type>/<int:node_number>')
 def generate(action_type, node_number):
     def gen():
-        if action_type == "add" and graph_gen:
+        if action_type == 'add_poison' and not graph_gen:
+            raise Exception
+        elif action_type in ['add_nodes', 'add_poison' ] and graph_gen:
             graph = graph_gen.pop()
             x = 0
         else:
             x = int(node_number * 0.1)
-            graph = DG.ProbGraph(node_num=x, edge_num=x * 10)
+            graph = PoisonGraph(node_num=x, edge_num=x * 10)
         interval = int(node_number * 0.1)
         try:
             while x < node_number:
                 if x + interval >= node_number:
                     interval = node_number - x
-                graph.addDynamic(interval, interval * 10)
+                if action_type in ['new_graph', 'add_nodes']:
+                    graph.addDynamic(interval, interval * 10)
+                elif len(graph.PoisonNodes) < len(graph.V):
+                    graph.addPoison(interval)
                 x += interval
                 ev = ServerSentEvent(graph, x)
                 yield ev.encode()
@@ -73,20 +81,40 @@ def generate(action_type, node_number):
         except GeneratorExit:
             if graph_gen:
                 graph_gen.clear()
-            raise Exception('Graph generation has been cancelled.')
+            raise Exception
 
     return Response(gen(), mimetype="text/event-stream")
 
-@app.route('/delete', methods=['POST'])
+@app.route('/api/scan/<int:node_number>', methods=['POST'])
+def scan(node_number):
+    if graph_gen:
+        graph = graph_gen[-1]
+    else:
+        abort(404, {'message': 'Your Graph Is Empty. Generate A Graph First!'})
+    if not graph.PoisonNodes:
+        abort(404, {'message': 'Your Graph Has No Poisons. Generate An Initial Poison Nodes First!'})
+    try:
+        counted = graph.scanPoison(node_number)
+        graph_gen.append(graph)
+    except Exception as e:
+        abort(404, {'message': e.args})
+
+    return json.dumps(graph.__dict__)
+
+@app.route('/api/delete', methods=['POST'])
 def delete():
     if graph_gen:
         graph = graph_gen.pop()
     else:
-        abort(404, {'message': 'Your Graph Is Empty.'})
+        abort(404, {'message': 'Your Graph Is Empty. Generate A Graph First!'})
     try:
-        delNum = random.randint(1, int(len(graph.V)))
-        delNodes = random.sample(graph.V, delNum)
-        graph.delNodesFrom(delNodes)
+        if graph.Principals:
+            graph.delPoisonFrom(graph.Principals)
+            graph.Principals.clear()
+        else:
+            delNum = random.randint(1, int(len(graph.V)))
+            delNodes = random.sample(graph.V, delNum)
+            graph.delNodesFrom(delNodes)
         if graph.V and graph.E:
             graph_gen.append(graph)
     except Exception as e:

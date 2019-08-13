@@ -68,39 +68,42 @@
             <div class="form-group">
               <label for="graph-type">Test Scenarios</label>
               <select name="graph_type" class="form-control" id="graph-type">
-                  <option value="create_random_graph" selected>Generate Dynamic Graph</option>
-                  <option value="virus_screen_game">A Virus Screening Game</option>
+                  <option value="random_graph" selected>Generate Dynamic Graph</option>
+                  <option value="poison_graph">Poison Screening Game</option>
               </select>
             </div>
             <div id="params">
               <div class="form-group">
-                <label for="dynamic_graph_n">Node Numbers</label>
-                <input name="N" type="number" class="form-control graph-param" id="dynamic_graph_n" placeholder="50〜5000" min="50" max="5000" step="1" value="2000" required="required">
+                <label for="dynamic_graph_n">Node Number</label>
+                <input name="N" type="number" class="form-control graph-param" id="dynamic_graph_n" placeholder="50〜5000" min="50" max="5000" step="1" value="200" required="required">
               </div>
               <div class="form-group">
-                <label for="dynamic_graph_e">Edge Numbers</label>
-                <input name="E" type="number" class="form-control graph-param" id="dynamic_graph_e" placeholder="500〜50000" min="500" max="50000" step="1" value="20000" required="required">
+                <label for="dynamic_graph_e">Edge Number</label>
+                <input name="E" type="number" class="form-control graph-param" id="dynamic_graph_e" placeholder="500〜50000" min="500" max="50000" step="1" value="2000" required="required">
               </div>
               <div class="form-group">
-                <label for="dynamic_graph_l">New Node Numbers</label>
+                <label for="dynamic_graph_l">New Node Number</label>
                 <input name="L" type="number" class="form-control graph-param" id="dynamic_graph_l" placeholder="50〜1000" min="50" max="1000" step="1" value="100" required="required">
               </div>
               <div class="form-group">
-                <label for="dynamic_graph_k">New Edge Numbers</label>
+                <label for="dynamic_graph_k">New Edge Number</label>
                 <input name="K" type="number" class="form-control graph-param" id="dynamic_graph_k" placeholder="500〜10000" min="500" max="10000" step="1" value="1000" required="required">
               </div>
               <div class="form-group">
-                <label for="dynamic_graph_p">Initial Virus Number (Random)</label>
-                <input name="P" type="number" class="form-control graph-param" id="dynamic_graph_p" placeholder="1〜100" min="1" max="100" step="1" value="100" required="required">
+                <label for="dynamic_graph_p">Initial Poison Number (Random)</label>
+                <input name="P" type="number" class="form-control graph-param" id="dynamic_graph_p" placeholder="10〜100" min="10" max="100" step="1" value="100" required="required">
               </div>
               <div class="form-group">
-                <label for="dynamic_graph_x">The Number To Be Removed</label>
-                <input name="X" type="number" class="form-control graph-param" id="dynamic_graph_x" placeholder="1〜100" min="1" max="100" step="1" value="100" required="required">
+                <label for="dynamic_graph_x">Number Of Poisons To Remove</label>
+                <input name="X" type="number" class="form-control graph-param" id="dynamic_graph_x" placeholder="1〜100" min="1" max="100" step="1" value="10" required="required">
               </div>
             </div>
-            <button type="submit" class="btn btn-primary" id="generate-button" data-loading-text="Generate">Generate</button>
-            <button type="button" class="btn btn-primary" id="add-button" data-loading-text="Add">Add</button>
-            <button type="button" class="btn btn-primary" id="del-button" data-loading-text="Del">Delete</button>
+            <div id="buttons">
+                <button type="submit" class="btn btn-primary" id="generate-button" data-loading-text="Generate">Generate</button>
+                <button type="button" class="btn btn-primary" id="add-button" data-loading-text="Add">Add</button>
+                <button type="button" class="btn btn-primary" id="scan-button" data-loading-text="Scan">Scan</button>
+                <button type="button" class="btn btn-primary" id="del-button" data-loading-text="Del">Delete</button>
+            </div>
           </form>
           <p id="github"><a href="https://github.com/thejourneyofman/DynamicGraph">&copy; 2019 Github </a></p>
 
@@ -148,7 +151,7 @@
           a("//connect.facebook.net/ja_JP/all.js#xfbml=1", "facebook-jssdk");
       })(this, document);
     </script>
-    <script type="text/javascript" src="https://cdn.ywxi.net/js/1.js" async></script>
+    <!-- <script type="text/javascript" src="https://cdn.ywxi.net/js/1.js" async></script> -->
 </body>
 </html>
 

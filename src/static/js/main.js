@@ -2,11 +2,13 @@
 var dynamicGraph = {};
 (function ($) {
     dynamicGraph.types = {
-        create_random_graph: {
-            required: ['dynamic_graph_n', 'dynamic_graph_e','dynamic_graph_l', 'dynamic_graph_k']
+        random_graph: {
+            required: ['dynamic_graph_n', 'dynamic_graph_e','dynamic_graph_l', 'dynamic_graph_k'],
+            buttons: ['generate-button', 'add-button', 'del-button']
         },
-        virus_screen_game: {
-            required: ['dynamic_graph_n', 'dynamic_graph_e','dynamic_graph_p', 'dynamic_graph_x']
+        poison_graph: {
+            required: ['dynamic_graph_p', 'dynamic_graph_x'],
+            buttons: ['generate-button', 'scan-button', 'del-button']
         }
     };
 
@@ -21,11 +23,7 @@ var dynamicGraph = {};
 
     dynamicGraph.request = function (svg, action_type, nodes_number) {
 
-        if (!!window.EventSource && action_type == "new") {
-          var source = new EventSource("/api/" + action_type + "/" + nodes_number);
-        }
-
-        if (!!window.EventSource && action_type == "add") {
+        if (!!window.EventSource) {
           var source = new EventSource("/api/" + action_type + "/" + nodes_number);
         }
 
@@ -34,7 +32,7 @@ var dynamicGraph = {};
           dynamicGraph.plotGraph(svg, json);
 
           if (Number(e.lastEventId) >= nodes_number ) {
-             dynamicGraph.show_alert(`Generation Complete.`, "success");
+             dynamicGraph.show_alert(`Generation Process In ${action_type} of ${nodes_number} Nodes Completed.`, "success");
              source.close(); // stop retry
           }
           // Get the loaded amount and total filesize (bytes)
@@ -50,10 +48,12 @@ var dynamicGraph = {};
 
         // error handler
         source.addEventListener("error", function (e) {
+          dynamicGraph.show_alert(`Your Graph Is Empty. Generate A Graph First!`, "warning");
           dynamicGraph.reset();
           if (e.readyState == EventSource.CLOSED) {
             dynamicGraph.show_alert(`Error generating graph`, "warning");
           }
+          source.close();
         }, false);
 
         // abort handler
@@ -67,11 +67,10 @@ var dynamicGraph = {};
     dynamicGraph.plotGraph = function (svg, json) {
         console.log("json", json);
         if (json.result == 404) {
-            alert(json.message);
+            dynamicGraph.show_alert(json.message, "warning");
             return true;
         };
         svg.graph.clear();
-
         var nodes = json.V.reduce((acc, current, index) => {
             node = {};
             node.id = current;
@@ -79,11 +78,10 @@ var dynamicGraph = {};
             node.x = Math.random();
             node.y = Math.random();
             node.size = json.neighbours[index].length;
-            node.color = '#666';
+            node.color = '#008cc2';
             svg.graph.addNode(node);
             return node;
         }, [])
-
         var edges = $.map(json.E, function (e, i) {
             edge = {};
             edge.id = i;
@@ -94,23 +92,18 @@ var dynamicGraph = {};
             svg.graph.addEdge(edge);
             return edge;
         });
-
-        svg.refresh();
-
-        $('.sigma-node').click(function() {
-          // Muting
-          $('.sigma-node, .sigma-edge').each(function() {
-            dynamicGraph.mute(this);
-          });
-          // Unmuting neighbors
-          var neighbors = svg.graph.neighborhood($(this).attr('data-node-id'));
-          neighbors.nodes.forEach(function(node) {
-            dynamicGraph.unmute($('[data-node-id="' + node.id + '"]')[0]);
-          });
-          neighbors.edges.forEach(function(edge) {
-            dynamicGraph.unmute($('[data-edge-id="' + edge.id + '"]')[0]);
-          });
+        svg.graph.nodes().forEach(function(n) {
+          if ("PoisonNodes" in json && json.PoisonNodes.indexOf(n.id) >= 0) {
+             n.size = 36;
+          }
         });
+        svg.graph.nodes().forEach(function(n) {
+          if ("Principals" in json && json.Principals.indexOf(n.id) >= 0) {
+             n.size = 72;
+             n.color = "#red";
+          }
+        });
+        svg.refresh();
     };
 
     // Function to reset the page
@@ -190,7 +183,13 @@ jQuery(function ($) {
             data[$input.attr('name')] = $input.val();
         });
 
-        dynamicGraph.request(svg, "new", Number(data['N']));
+        if (typeName == "random_graph") {
+            dynamicGraph.request(svg, "new_graph", Number(data['N']));
+        }
+
+        if (typeName == "poison_graph") {
+            dynamicGraph.request(svg, "add_poison", Number(data['P']));
+        }
 
         return false;
     });
@@ -211,8 +210,43 @@ jQuery(function ($) {
             return;
         }
 
-        dynamicGraph.request(svg, "add", Number(data['L']));
+        dynamicGraph.request(svg, "add_nodes", Number(data['L']));
 
+        return false;
+    });
+
+    $('#scan-button').click(function () {
+
+        var typeName = $graphTypeInput.val(),
+            type = dynamicGraph.types[typeName],
+            data = {}
+
+        $.each(type["required"], function (i, id) {
+            var $input = $("#" + id);
+            data[$input.attr('name')] = $input.val();
+        });
+
+        $.ajax({
+            url: "/api/scan/" + data['X'],
+            type: "POST",
+            cache: false,
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (json) {
+                dynamicGraph.plotGraph(svg, json);
+                if (json.result != 404) {
+                    dynamicGraph.show_alert(`Poison Scan Completed. ${json.PoisonNodes.length} poisons found.
+                    Principals nodes of [${json.Principals.sort()}] that if removed, would minimize the impact of infection.`, "success");
+                };
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                var json = $.parseJSON(xhr.responseText);
+                var errors = json.errors;
+            },
+            complete: function () {
+            }
+        });
         return false;
     });
 
@@ -228,7 +262,7 @@ jQuery(function ($) {
         });
 
         $.ajax({
-            url: "/delete",
+            url: "/api/delete",
             type: "POST",
             cache: false,
             data: JSON.stringify(data),
@@ -236,6 +270,9 @@ jQuery(function ($) {
             dataType: "json",
             success: function (json) {
                 dynamicGraph.plotGraph(svg, json);
+                if (json.result != 404 && json.deletedNodes > 0 ) {
+                    dynamicGraph.show_alert(` ${json.deletedNodes} infected nodes removed from the graph.`, "success");
+                };
             },
             error: function (xhr, textStatus, errorThrown) {
                 var json = $.parseJSON(xhr.responseText);
@@ -250,16 +287,40 @@ jQuery(function ($) {
     var $graphTypeInput = $('#graph-type'),
         $params = $('#params > div'),
         $paramsInputs = $params.find('input');
+        $buttons = $('#buttons'),
+        $buttonsItem = $buttons.find('button');
         $('#graph-type').change(function () {
             var typeName = $graphTypeInput.val(),
                 type = dynamicGraph.types[typeName];
             $paramsInputs.attr('disabled', 'disabled');
             $params.hide();
+            $buttonsItem.attr('disabled', 'disabled');
+            $buttons.hide();
             $.each(type['required'], function (i, id) {
                 var $input = $('#' + id);
                 $input.parent().show();
                 $input.removeAttr('disabled');
             });
+            $.each(type['buttons'], function (i, id) {
+                var $button = $('#' + id);
+                $button.parent().show();
+                $button.removeAttr('disabled');
+            });
         }).change();
+
+    $('.sigma-node').click(function() {
+          // Muting
+          $('.sigma-node, .sigma-edge').each(function() {
+            dynamicGraph.mute(this);
+          });
+          // Unmuting neighbors
+          var neighbors = svg.graph.neighborhood($(this).attr('data-node-id'));
+          neighbors.nodes.forEach(function(node) {
+            dynamicGraph.unmute($('[data-node-id="' + node.id + '"]')[0]);
+          });
+          neighbors.edges.forEach(function(edge) {
+            dynamicGraph.unmute($('[data-edge-id="' + edge.id + '"]')[0]);
+          });
+        });
 
 });
