@@ -3,7 +3,7 @@ from flask import Flask, Response, request, render_template, abort
 import json
 import random
 import time
-from PoisonGrapn import *
+from src.PoisonGrapn import *
 
 app = Flask(__name__)
 graph_gen = []
