@@ -56,7 +56,6 @@ def get_index():
 
 @app.route('/api/<string:action_type>/<int:node_number>')
 def generate(action_type, node_number):
-    print(graph_gen)
     def gen():
         if action_type == 'add_nodes' and graph_gen:
             graph = graph_gen.pop()
@@ -86,7 +85,6 @@ def generate(action_type, node_number):
                 ev = ServerSentEvent(graph, x)
                 yield ev.encode()
                 graph_gen.append(graph)
-            print(graph_gen)
         except GeneratorExit:
             graph_gen.clear()
             raise Exception
@@ -94,7 +92,6 @@ def generate(action_type, node_number):
 
 @app.route('/api/scan/<int:node_number>', methods=['POST'])
 def scan(node_number):
-    print(graph_gen)
     if graph_gen:
         graph = graph_gen.pop()
     else:
@@ -104,7 +101,6 @@ def scan(node_number):
     try:
         counted = graph.scanPoison(node_number)
         graph_gen.append(graph)
-        print(graph_gen)
     except Exception as e:
         graph_gen.clear()
         abort(404, {'message': e.args})
@@ -113,7 +109,6 @@ def scan(node_number):
 
 @app.route('/api/delete', methods=['POST'])
 def delete():
-    print(graph_gen)
     if graph_gen:
         graph = graph_gen.pop()
     else:
@@ -128,7 +123,6 @@ def delete():
             graph.delNodesFrom(delNodes)
         if graph.V and graph.E:
             graph_gen.append(graph)
-        print(graph_gen)
     except Exception as e:
         graph_gen.clear()
         abort(404, {'message': e.args})

@@ -236,7 +236,7 @@ jQuery(function ($) {
             success: function (json) {
                 dynamicGraph.plotGraph(svg, json);
                 if (json.result != 404) {
-                    dynamicGraph.show_alert(`Poison Scan Completed. ${json.PoisonNodes.length} poisons found.
+                    dynamicGraph.show_alert(`Poison Scan Completed. ${json.PoisonNodes.length} poison nodes found.
                     Principals nodes of [${json.Principals.sort()}] that if removed, would minimize the impact of infection.`, "success");
                 };
             },
