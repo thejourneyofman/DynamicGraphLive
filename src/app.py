@@ -92,7 +92,6 @@ def generate(action_type, node_number):
 
 @app.route('/api/scan/<int:node_number>', methods=['POST'])
 def scan(node_number):
-    print(graph_gen)
     if graph_gen:
         graph = graph_gen.pop()
     else:

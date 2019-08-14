@@ -55,7 +55,7 @@
     <script type="text/javascript" src="{{url_for('static', filename='js/vendor/plugins/sigma.plugins.neighborhoods/sigma.plugins.neighborhoods.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/vendor/plugins/sigma.layout.forceAtlas2/supervisor.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/vendor/plugins/sigma.layout.forceAtlas2/worker.js')}}"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/vendor/jquery-2.1.1.min.js')}}"></script>
     <script type='text/javascript' src="{{url_for('static', filename='js/vendor/bootstrap.min.js')}}"></script>
 </head>
 <body >
@@ -75,11 +75,11 @@
             <div id="params">
               <div class="form-group">
                 <label for="dynamic_graph_n">Node Number</label>
-                <input name="N" type="number" class="form-control graph-param" id="dynamic_graph_n" placeholder="50〜5000" min="50" max="5000" step="1" value="2000" required="required">
+                <input name="N" type="number" class="form-control graph-param" id="dynamic_graph_n" placeholder="50〜5000" min="50" max="5000" step="1" value="200" required="required">
               </div>
               <div class="form-group">
                 <label for="dynamic_graph_e">Edge Number</label>
-                <input name="E" type="number" class="form-control graph-param" id="dynamic_graph_e" placeholder="500〜50000" min="500" max="50000" step="1" value="20000" required="required">
+                <input name="E" type="number" class="form-control graph-param" id="dynamic_graph_e" placeholder="500〜50000" min="500" max="50000" step="1" value="2000" required="required">
               </div>
               <div class="form-group">
                 <label for="dynamic_graph_l">New Node Number</label>
