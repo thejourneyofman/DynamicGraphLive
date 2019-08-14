@@ -3,7 +3,7 @@ from flask import Flask, Response, request, render_template, abort
 import json
 import random
 import time
-from src.PoisonGrapn import *
+from PoisonGrapn import *
 
 app = Flask(__name__)
 graph_gen = []
@@ -92,6 +92,7 @@ def generate(action_type, node_number):
 
 @app.route('/api/scan/<int:node_number>', methods=['POST'])
 def scan(node_number):
+    print(graph_gen)
     if graph_gen:
         graph = graph_gen.pop()
     else:

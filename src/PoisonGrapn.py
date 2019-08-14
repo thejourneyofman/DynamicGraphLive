@@ -2,7 +2,7 @@
 
 import random
 import copy
-from src.DynamicGraph import DynamicGraph as DG
+from DynamicGraph import DynamicGraph as DG
 
 class PoisonGraph(DG.ProbGraph):
     u"""Derived class of ProbGraph for a virus network. Anything that can be
