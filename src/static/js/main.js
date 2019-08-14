@@ -225,7 +225,7 @@ jQuery(function ($) {
                 };
             },
             error: function (xhr, textStatus, errorThrown) {
-                dynamicGraph.show_alert(`Initialization of Poison Nodes Is NOT Completed. Please wait and try it again.`, "error");
+                dynamicGraph.show_alert(`Initialization of Poison Nodes Is NOT Completed. Please wait and try it again.`, "danger");
             },
             complete: function () {
             }
