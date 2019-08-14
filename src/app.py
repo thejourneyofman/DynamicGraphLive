@@ -3,7 +3,7 @@ from flask import Flask, Response, request, render_template, abort
 import json
 import random
 import time
-from src.PoisonGrapn import *
+from PoisonGrapn import *
 
 app = Flask(__name__)
 graph_gen = []
@@ -56,15 +56,23 @@ def get_index():
 
 @app.route('/api/<string:action_type>/<int:node_number>')
 def generate(action_type, node_number):
+    print(graph_gen)
     def gen():
-        if action_type == 'add_poison' and not graph_gen:
-            raise Exception
-        elif action_type in ['add_nodes', 'add_poison' ] and graph_gen:
+        if action_type == 'add_nodes' and graph_gen:
             graph = graph_gen.pop()
             x = 0
+        elif action_type == 'add_poison':
+            if graph_gen:
+                graph = graph_gen.pop()
+                graph_gen.clear()
+                x = 0
+            else:
+                raise Exception
         else:
+            graph_gen.clear()
             x = int(node_number * 0.1)
             graph = PoisonGraph(node_num=x, edge_num=x * 10)
+            graph_gen.append(graph)
         interval = int(node_number * 0.1)
         try:
             while x < node_number:
@@ -77,18 +85,18 @@ def generate(action_type, node_number):
                 x += interval
                 ev = ServerSentEvent(graph, x)
                 yield ev.encode()
-            graph_gen.append(graph)
+                graph_gen.append(graph)
+            print(graph_gen)
         except GeneratorExit:
-            if graph_gen:
-                graph_gen.clear()
+            graph_gen.clear()
             raise Exception
-
     return Response(gen(), mimetype="text/event-stream")
 
 @app.route('/api/scan/<int:node_number>', methods=['POST'])
 def scan(node_number):
+    print(graph_gen)
     if graph_gen:
-        graph = graph_gen[-1]
+        graph = graph_gen.pop()
     else:
         abort(404, {'message': 'Your Graph Is Empty. Generate A Graph First!'})
     if not graph.PoisonNodes:
@@ -96,13 +104,16 @@ def scan(node_number):
     try:
         counted = graph.scanPoison(node_number)
         graph_gen.append(graph)
+        print(graph_gen)
     except Exception as e:
+        graph_gen.clear()
         abort(404, {'message': e.args})
 
     return json.dumps(graph.__dict__)
 
 @app.route('/api/delete', methods=['POST'])
 def delete():
+    print(graph_gen)
     if graph_gen:
         graph = graph_gen.pop()
     else:
@@ -117,7 +128,9 @@ def delete():
             graph.delNodesFrom(delNodes)
         if graph.V and graph.E:
             graph_gen.append(graph)
+        print(graph_gen)
     except Exception as e:
+        graph_gen.clear()
         abort(404, {'message': e.args})
 
     return json.dumps(graph.__dict__)
