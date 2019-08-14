@@ -225,11 +225,7 @@ jQuery(function ($) {
                 };
             },
             error: function (xhr, textStatus, errorThrown) {
-                console.log(xhr);
-                console.log(textStatus);
-                console.log(errorThrown);
-                var json = $.parseJSON(xhr.responseText);
-                var errors = json.errors;
+                dynamicGraph.show_alert(`Initialization of Poison Nodes Is NOT Completed. Please wait and try it again.`, "error");
             },
             complete: function () {
             }
