@@ -88,7 +88,7 @@ var dynamicGraph = {};
             return edge;
         });
         svg.graph.nodes().forEach(function(n) {
-          if ("PoisonNodes" in json && json.PoisonNodes.indexOf(n.id) >= 0) {
+          if ("infected_nodes" in json && json.infected_nodes.indexOf(n.id) >= 0) {
              n.size = 36;
           }
         });
@@ -220,12 +220,12 @@ jQuery(function ($) {
             success: function (json) {
                 dynamicGraph.plotGraph(svg, json);
                 if (json.result != 404) {
-                    dynamicGraph.show_alert(`Poison Scan Completed. ${json.PoisonNodes.length} poison nodes found.
+                    dynamicGraph.show_alert(`Poison Scan Completed. ${json.infected_nodes.length} poison nodes found.
                     Principals nodes of [${json.Principals.sort()}] that if removed, would minimize the impact of infection.`, "success");
                 };
             },
             error: function (xhr, textStatus, errorThrown) {
-                dynamicGraph.show_alert(`Initialization of Poison Nodes Is NOT Completed. Please wait and try it again.`, "danger");
+                dynamicGraph.show_alert(`Initialization of Poison Nodes Is NOT Completed. Please wait a while and try it again.`, "danger");
             },
             complete: function () {
             }

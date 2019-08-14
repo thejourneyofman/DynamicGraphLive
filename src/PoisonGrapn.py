@@ -25,7 +25,8 @@ class PoisonGraph(DG.ProbGraph):
     def __init__(self, node_num, edge_num, poison_number=0, gamma=3, empty=False):
         self.V = list(range(node_num))
         self.E = []
-        self.PoisonNodes = list(range(poison_number))
+        self.InitialPoison = list(range(poison_number))
+        self.infected_nodes = list(range(poison_number))
         self.Principals = []
         self.deletedNodes = 0
         self.temp_component = []
@@ -48,13 +49,13 @@ class PoisonGraph(DG.ProbGraph):
         u"""Mark new poison nodes to an exiting graph without adding nodes
             :param node_num: the number of newly makred poison nodes.
         """
-        self.PoisonNodes.extend(random.sample([v for v in self.V if v not in self.PoisonNodes], node_num))
+        self.InitialPoison.extend(random.sample([v for v in self.V if v not in self.InitialPoison], node_num))
 
     def getPoison(self):
         u"""Returns all poison nodes in an exiting graph
             :param None
         """
-        return self.PoisonNodes
+        return self.infected_nodes
 
     def delPoisonFrom(self, nodes):
         u"""Delete all infected nodes from an exiting graph using a recursive
@@ -67,6 +68,8 @@ class PoisonGraph(DG.ProbGraph):
             self.deletedNodes += 1
             self.connected_nodes[:] = (value for value in self.connected_nodes if value != v)
             self.isolated_nodes[:] = (value for value in self.isolated_nodes if value != v)
+            self.infected_nodes[:] = (value for value in self.infected_nodes if value != v)
+            self.InitialPoison[:] = (value for value in self.InitialPoison if value != v)
             for n in self.neighbours[v]:
                 self.connected_nodes.remove(n)
                 self.neighbours[n].remove(v)
@@ -92,6 +95,8 @@ class PoisonGraph(DG.ProbGraph):
                     self.deletedNodes += 1
                     self.connected_nodes[:] = (value for value in self.connected_nodes if value != v)
                     self.isolated_nodes[:] = (value for value in self.isolated_nodes if value != v)
+                    self.infected_nodes[:] = (value for value in self.infected_nodes if value != v)
+                    self.InitialPoison[:] = (value for value in self.InitialPoison if value != v)
                     for n in self.neighbours[v]:
                         self.connected_nodes.remove(n)
                         self.neighbours[n].remove(v)
@@ -110,20 +115,21 @@ class PoisonGraph(DG.ProbGraph):
     def scanPoison(self, node_num):
         u""" It return a final count of nodes infected with poison in the entire
             graph after the spread of poison stops and a list of Principals node
-            that if removed, would minimize scanPoison(PoisonNodes).
+            that if removed, would minimize scanPoison(InitialPoison).
             :param node_num: the number of principals poison nodes.
-            the length should be between 1 and len(PoisonNodes) - 1
+            the length should be between 1 and len(InitialPoison) - 1
         """
-        if node_num > len(self.PoisonNodes) - 1:
-            return len(self.PoisonNodes), self.PoisonNodes
+        if node_num > len(self.InitialPoison) - 1:
+            return len(self.InitialPoison), self.InitialPoison
         sorted_components = sorted(self.connected_components, key=len, reverse=True)
         counted = 0
-        p = set(self.PoisonNodes)
+        p = set(self.InitialPoison)
+        self.infected_nodes.extend(self.InitialPoison)
         for i, v in enumerate(sorted_components):
             s = set(v)
             if len(tuple(s & p)) > 0:
                 counted += len(v)
-                self.PoisonNodes.extend(list(tuple(s - p)))
+                self.infected_nodes.extend(list(tuple(s - p)))
                 if len(self.Principals) < node_num:
                     self.Principals.append(random.choice(tuple(s & p)))
                 p -= s
@@ -134,5 +140,5 @@ class PoisonGraph(DG.ProbGraph):
             if len(tuple(p)) > 0:
                 self.Principals.extend(random.sample(p, node_num - len(principals)))
             else:
-                self.Principals = random.sample(self.PoisonNodes, node_num)
+                self.Principals = random.sample(self.InitialPoison, node_num)
         return counted

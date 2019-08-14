@@ -29,7 +29,8 @@ class ServerSentEvent(object):
             str(list(self.data.neighbours.values())): 'neighbours',
             str(self.data.Principals): 'Principals',
             str(self.data.deletedNodes): 'deletedNodes',
-            str(self.data.PoisonNodes): 'PoisonNodes'
+            str(self.data.InitialPoison): 'InitialPoison',
+            str(self.data.infected_nodes): 'infected_nodes'
             # str(self.data.connected_components): 'connected_components',
             # str(self.data.connected_nodes): 'connected_nodes',
             # str(self.data.gamma): 'gamma',
@@ -81,7 +82,7 @@ def generate(action_type, node_number):
                     interval = node_number - x
                 if action_type in ['new_graph', 'add_nodes']:
                     graph.addDynamic(interval, interval * 10)
-                elif len(graph.PoisonNodes) < len(graph.V):
+                elif len(graph.InitialPoison) < len(graph.V):
                     graph.addPoison(interval)
                 x += interval
                 ev = ServerSentEvent(graph, x)
@@ -98,7 +99,7 @@ def scan(node_number):
         graph = graph_gen.pop()
     else:
         abort(404, {'message': 'Your Graph Is Empty. Generate A Graph First!'})
-    if not graph.PoisonNodes:
+    if not graph.InitialPoison:
         abort(404, {'message': 'Your Graph Has No Poisons. Generate An Initial Poison Nodes First!'})
     try:
         counted = graph.scanPoison(node_number)
