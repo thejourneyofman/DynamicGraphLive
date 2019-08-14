@@ -4,4 +4,5 @@ scipy>=1.1.0
 flask>=1.0.2
 pandas>=0.23.3
 PyYAML>=3.13
-gunicorn
+gunicorn==18.0
+eventlet==0.17.4
