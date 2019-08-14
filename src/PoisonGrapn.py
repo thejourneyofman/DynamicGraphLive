@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import random
@@ -5,13 +6,14 @@ import copy
 from src.DynamicGraph import DynamicGraph as DG
 
 class PoisonGraph(DG.ProbGraph):
-    u"""Derived class of ProbGraph for a virus network. Anything that can be
-        represented by an initial infected list.Returns a class of processed
-        graph following a power-law rule of edge degrees for every node and
-        size of components based on the node numbers, max edge numbers and
-        special curves pattern.
+    u"""Derived class of ProbGraph for a poison network. Anything that can be
+        represented by an initial infected nodes list. It returns a class of
+        processed graph following a power-law rule of edge degrees for every
+        node and size of components based on the node numbers, max edge numbers
+        and special curves pattern.
        :param ProbGraph: totally generated nodes num.
        :param edge_num: max allowed edge numbers generating the graph.
+       :param poison_number: number of the initial poison nodes
        :param gamma: It is a parameter of kurtosis for the distribution of edge
         degrees or cluster size that follows a power-law rules. If it is greater,
         the distribution of connected components will have a higher kurtosis.
@@ -43,17 +45,21 @@ class PoisonGraph(DG.ProbGraph):
             self.updateComponents()
 
     def addPoison(self, node_num):
-        u"""Add new poison nodes to an exiting graph in a dynamic way
-            :param node_num: the number of newly added poison nodes.
+        u"""Mark new poison nodes to an exiting graph without adding nodes
+            :param node_num: the number of newly makred poison nodes.
         """
         self.PoisonNodes.extend(random.sample([v for v in self.V if v not in self.PoisonNodes], node_num))
 
     def getPoison(self):
+        u"""Returns all poison nodes in an exiting graph
+            :param None
+        """
         return self.PoisonNodes
 
     def delPoisonFrom(self, nodes):
-        u"""Delete nodes from an exiting graph in a dynamic way.
-            :param nodes: the nodes list to be deleted from the graph
+        u"""Delete all infected nodes from an exiting graph using a recursive
+            way with dfs algorithm to search nodes by their neighbours.
+            :param nodes: the initial poison nodes list
         """
         self.deletedNodes = 0
         for v in [value for value in nodes if value in self.V]:
@@ -71,6 +77,7 @@ class PoisonGraph(DG.ProbGraph):
                 else:
                     self.E.remove((v, n))
                 self.neighbours[v] = []
+
         sorted_components = sorted(self.connected_components, key=len, reverse=True)
         p = set(nodes)
         for i, component in enumerate(sorted_components):
@@ -101,10 +108,11 @@ class PoisonGraph(DG.ProbGraph):
 
 
     def scanPoison(self, node_num):
-        u""" It return a final number of nodes infected with poison in the entire
-            graph after the spread of poison stops and a list of N principals node
+        u""" It return a final count of nodes infected with poison in the entire
+            graph after the spread of poison stops and a list of Principals node
             that if removed, would minimize scanPoison(PoisonNodes).
-            :param node_num: the length of (N) should be between 1 and len(PoisonNodes - 1)
+            :param node_num: the number of principals poison nodes.
+            the length should be between 1 and len(PoisonNodes) - 1
         """
         if node_num > len(self.PoisonNodes) - 1:
             return len(self.PoisonNodes), self.PoisonNodes
@@ -128,4 +136,3 @@ class PoisonGraph(DG.ProbGraph):
             else:
                 self.Principals = random.sample(self.PoisonNodes, node_num)
         return counted
-

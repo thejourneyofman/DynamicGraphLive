@@ -71,6 +71,8 @@ def generate(action_type, node_number):
             graph_gen.clear()
             x = int(node_number * 0.1)
             graph = PoisonGraph(node_num=x, edge_num=x * 10)
+            ev = ServerSentEvent(graph, x)
+            yield ev.encode()
             graph_gen.append(graph)
         interval = int(node_number * 0.1)
         try:

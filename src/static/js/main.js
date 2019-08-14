@@ -22,11 +22,9 @@ var dynamicGraph = {};
     };
 
     dynamicGraph.request = function (svg, action_type, nodes_number) {
-
         if (!!window.EventSource) {
           var source = new EventSource("/api/" + action_type + "/" + nodes_number);
         }
-
         source.addEventListener('message', function(e) {
           json  = JSON.parse(e.data);
           dynamicGraph.plotGraph(svg, json);
@@ -43,9 +41,7 @@ var dynamicGraph = {};
           // Update the progress text and progress bar
           progress.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
           progress_status.innerText = `${Math.floor(percent_complete)}% completed`;
-
         }, false);
-
         // error handler
         source.addEventListener("error", function (e) {
           dynamicGraph.show_alert(`Your Graph Is Empty. Generate A Graph First!`, "warning");
@@ -55,7 +51,6 @@ var dynamicGraph = {};
           }
           source.close();
         }, false);
-
         // abort handler
         cancel_btn.addEventListener("click", function (e) {
            dynamicGraph.show_alert(`Generation cancelled`, "danger");
@@ -120,7 +115,6 @@ var dynamicGraph = {};
         progress_wrapper.classList.add("d-none");
         // Reset the progress bar state
         progress.setAttribute("style", `width: 0%`);
-
     };
 
     // Function to show alerts
@@ -173,59 +167,49 @@ jQuery(function ($) {
         dynamicGraph.reset();
         $('.progress').css('display', 'block');
         event.preventDefault();
-
         var typeName = $graphTypeInput.val(),
             type = dynamicGraph.types[typeName],
             data = {}
-
         $.each(type["required"], function (i, id) {
             var $input = $("#" + id);
             data[$input.attr('name')] = $input.val();
         });
-
         if (typeName == "random_graph") {
+            dynamicGraph.show_alert(`Initializing A Graph...Please Wait.`, "warning");
             dynamicGraph.request(svg, "new_graph", Number(data['N']));
         }
-
         if (typeName == "poison_graph") {
+            dynamicGraph.show_alert(`Initializing Poison Nodes...Please Wait.`, "warning");
             dynamicGraph.request(svg, "add_poison", Number(data['P']));
         }
-
         return false;
     });
 
      $('#add-button').click(function () {
-
         var typeName = $graphTypeInput.val(),
             type = dynamicGraph.types[typeName],
             data = {}
-
         $.each(type["required"], function (i, id) {
             var $input = $("#" + id);
             data[$input.attr('name')] = $input.val();
         });
-
         if (Number(data['L']) < 50) {
             dynamicGraph.show_alert(`Numbers Of New Nodes Must Be Greater Than 50`, "warning");
             return;
         }
-
         dynamicGraph.request(svg, "add_nodes", Number(data['L']));
-
         return false;
     });
 
     $('#scan-button').click(function () {
-
+        dynamicGraph.show_alert(`Scanning A Graph...Please Wait.`, "warning");
         var typeName = $graphTypeInput.val(),
             type = dynamicGraph.types[typeName],
             data = {}
-
         $.each(type["required"], function (i, id) {
             var $input = $("#" + id);
             data[$input.attr('name')] = $input.val();
         });
-
         $.ajax({
             url: "/api/scan/" + data['X'],
             type: "POST",
@@ -251,7 +235,6 @@ jQuery(function ($) {
     });
 
     $('#del-button').click(function () {
-
         var typeName = $graphTypeInput.val(),
             type = dynamicGraph.types[typeName],
             data = {}
@@ -260,7 +243,6 @@ jQuery(function ($) {
             var $input = $("#" + id);
             data[$input.attr('name')] = $input.val();
         });
-
         $.ajax({
             url: "/api/delete",
             type: "POST",
@@ -271,7 +253,7 @@ jQuery(function ($) {
             success: function (json) {
                 dynamicGraph.plotGraph(svg, json);
                 if (json.result != 404 && json.deletedNodes > 0 ) {
-                    dynamicGraph.show_alert(` ${json.deletedNodes} infected nodes removed from the graph.`, "success");
+                    dynamicGraph.show_alert(` ${json.deletedNodes} infected nodes are removed from the graph.`, "success");
                 };
             },
             error: function (xhr, textStatus, errorThrown) {
