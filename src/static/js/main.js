@@ -257,6 +257,7 @@ jQuery(function ($) {
                 };
             },
             error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.responseText);
                 var json = $.parseJSON(xhr.responseText);
                 var errors = json.errors;
             },
