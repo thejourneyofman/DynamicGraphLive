@@ -45,6 +45,11 @@ class PoisonGraph(DG.ProbGraph):
             self._createEdges(edge_num)
             self.updateComponents()
 
+    def __contains__(self, keys):
+        if self.__dict__ is None:
+            raise TypeError('not indexable')
+        return dict((key,value) for key, value in self.__dict__.items() if key in keys)
+
     def addPoison(self, node_num):
         u"""Mark new poison nodes to an exiting graph without adding nodes
             :param node_num: the number of newly makred poison nodes.

@@ -257,7 +257,7 @@ class ProbGraph():
         self.connected_components = []
         for x in self._dfs_non_recursive(self.V):
             #print("visited", x)
-            continue
+            pass
 
         ##############################################
         # Recursive way fails at big data >= 200K nodes
@@ -339,7 +339,7 @@ class ProbGraph():
                     continue
                 for x in self._dfs_non_recursive(component):
                     #print("visited", x)
-                    continue
+                    pass
                 p -= s
                 if len(tuple(p)) == 0:
                     break

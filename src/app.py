@@ -7,6 +7,7 @@ from src.PoisonGrapn import *
 
 app = Flask(__name__)
 graph_gen = []
+poison_map = ['V', 'E', 'neighbours', 'Principals','deletedNodes', 'InitialPoison', 'infected_nodes']
 
 class ServerSentEvent(object):
     def __init__(self, data, event_id):
@@ -107,8 +108,7 @@ def scan(node_number):
     except Exception as e:
         graph_gen.clear()
         abort(404, {'message': e.args})
-
-    return json.dumps(graph.__dict__)
+    return json.dumps(graph.__contains__(poison_map))
 
 @app.route('/api/delete', methods=['POST'])
 def delete():
@@ -129,8 +129,7 @@ def delete():
     except Exception as e:
         graph_gen.clear()
         abort(404, {'message': e.args})
-
-    return json.dumps(graph.__dict__)
+    return json.dumps(graph.__contains__(poison_map))
 
 @app.errorhandler(404)
 def error_handler(error):
