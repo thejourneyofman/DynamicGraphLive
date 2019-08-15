@@ -72,7 +72,7 @@ var dynamicGraph = {};
             node.label = 'Node ' + current;
             node.x = Math.random();
             node.y = Math.random();
-            node.size = json.neighbours[index].length;
+            node.size = Math.random();
             node.color = '#008cc2';
             svg.graph.addNode(node);
             return node;
