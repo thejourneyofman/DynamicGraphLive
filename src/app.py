@@ -62,10 +62,13 @@ def generate(action_type, node_number):
         if action_type == 'add_nodes' and graph_gen:
             graph = graph_gen.pop()
             x = 0
-        elif action_type == 'add_poison' and graph_gen:
-            graph = graph_gen.pop()
-            graph_gen.clear()
-            x = 0
+        elif action_type == 'add_poison':
+            if graph_gen:
+                graph = graph_gen.pop()
+                graph_gen.clear()
+                x = 0
+            else:
+                raise StopIteration
         else:
             graph_gen.clear()
             x = int(node_number * 0.1)
