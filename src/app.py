@@ -62,13 +62,10 @@ def generate(action_type, node_number):
         if action_type == 'add_nodes' and graph_gen:
             graph = graph_gen.pop()
             x = 0
-        elif action_type == 'add_poison':
-            if graph_gen:
-                graph = graph_gen.pop()
-                graph_gen.clear()
-                x = 0
-            else:
-                raise Exception
+        elif action_type == 'add_poison' and graph_gen:
+            graph = graph_gen.pop()
+            graph_gen.clear()
+            x = 0
         else:
             graph_gen.clear()
             x = int(node_number * 0.1)
@@ -91,7 +88,6 @@ def generate(action_type, node_number):
                 graph_gen.append(graph)
         except GeneratorExit:
             graph_gen.clear()
-            raise Exception
     return Response(gen(), mimetype="text/event-stream")
 
 @app.route('/api/scan/<int:node_number>', methods=['POST'])
