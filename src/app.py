@@ -89,6 +89,9 @@ def generate(action_type, node_number):
                 ev = ServerSentEvent(graph, x)
                 yield ev.encode()
                 graph_gen.append(graph)
+        except StopIteration:
+            print("ddddddd")
+            pass
         except GeneratorExit:
             graph_gen.clear()
     return Response(gen(), mimetype="text/event-stream")
