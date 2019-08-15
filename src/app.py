@@ -7,10 +7,10 @@ from src.PoisonGrapn import *
 
 app = Flask(__name__)
 graph_gen = []
-poison_map = ['V', 'E', 'Principals','deletedNodes', 'InitialPoison', 'infected_nodes']
+poison_map = ['new_V', 'E', 'Principals','deletedNodes', 'InitialPoison', 'infected_nodes']
 
 class ServerSentEvent(object):
-    def __init__(self, data, event_id):
+    def __init__(self, data, event_id=0):
         self.data = data
         self.event = None
         self.event_id = event_id
@@ -24,10 +24,10 @@ class ServerSentEvent(object):
         if not self.data:
             return ''
         lines = []
+        new_V = [(key,len(self.data.neighbours[key])) for key in self.data.V & self.data.neighbours.keys()]
         graph_map = {
-            str(self.data.V): 'V',
+            str([list(row) for row in new_V]): 'new_V',
             str([list(row) for row in self.data.E]): 'E',
-            str(list(self.data.neighbours.values())): 'neighbours',
             str(self.data.Principals): 'Principals',
             str(self.data.deletedNodes): 'deletedNodes',
             str(self.data.InitialPoison): 'InitialPoison',

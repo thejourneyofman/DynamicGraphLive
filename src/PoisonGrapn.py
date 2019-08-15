@@ -48,6 +48,7 @@ class PoisonGraph(DG.ProbGraph):
     def __contains__(self, keys):
         if self.__dict__ is None:
             raise TypeError('not indexable')
+        self.new_V = [(key, len(self.neighbours[key])) for key in self.V & self.neighbours.keys()]
         return dict((key,value) for key, value in self.__dict__.items() if key in keys)
 
     def addPoison(self, node_num):

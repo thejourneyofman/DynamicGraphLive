@@ -66,17 +66,30 @@ var dynamicGraph = {};
             return true;
         };
         svg.graph.clear();
-        var nodes = json.V.reduce((acc, current, index) => {
+
+        var nodes = $.map(json.new_V, function (n, i) {
             node = {};
-            node.id = current;
-            node.label = 'Node ' + current;
+            node.id = n[0];
+            node.label = 'Node ' + node.id;
             node.x = Math.random();
             node.y = Math.random();
-            node.size = Math.random();
+            node.size = n[1];
             node.color = '#008cc2';
             svg.graph.addNode(node);
             return node;
-        }, [])
+        });
+
+        //var nodes = json.V.reduce((acc, current, index) => {
+        //    node = {};
+        //    node.id = current;
+        //    node.label = 'Node ' + current;
+        //    node.x = Math.random();
+        //    node.y = Math.random();
+        //    node.size = Math.random();
+        //    node.color = '#008cc2';
+        //    svg.graph.addNode(node);
+        //    return node;
+        //}, [])
         var edges = $.map(json.E, function (e, i) {
             edge = {};
             edge.id = i;
@@ -250,6 +263,7 @@ jQuery(function ($) {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (json) {
+                console.log(json);
                 dynamicGraph.plotGraph(svg, json);
                 if (json.result != 404 && json.deletedNodes > 0 ) {
                     dynamicGraph.show_alert(` ${json.deletedNodes} infected nodes are removed from the graph.`, "success");
