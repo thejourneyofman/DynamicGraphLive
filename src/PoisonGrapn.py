@@ -126,6 +126,8 @@ class PoisonGraph(DG.ProbGraph):
             :param node_num: the number of principals poison nodes.
             the length should be between 1 and len(InitialPoison) - 1
         """
+        self.infected_nodes.clear()
+        self.Principals.clear()
         if node_num > len(self.InitialPoison) - 1:
             return len(self.InitialPoison), self.InitialPoison
         sorted_components = sorted(self.connected_components, key=len, reverse=True)
