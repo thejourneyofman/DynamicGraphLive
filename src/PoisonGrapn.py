@@ -55,6 +55,7 @@ class PoisonGraph(DG.ProbGraph):
             :param node_num: the number of newly makred poison nodes.
         """
         self.InitialPoison.extend(random.sample([v for v in self.V if v not in self.InitialPoison], node_num))
+        self.infected_nodes.extend(self.InitialPoison)
 
     def getPoison(self):
         u"""Returns all poison nodes in an exiting graph
