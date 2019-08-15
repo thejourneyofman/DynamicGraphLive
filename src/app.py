@@ -7,7 +7,7 @@ from src.PoisonGrapn import *
 
 app = Flask(__name__)
 graph_gen = []
-poison_map = ['V', 'E', 'neighbours', 'Principals','deletedNodes', 'InitialPoison', 'infected_nodes']
+poison_map = ['V', 'E', 'Principals','deletedNodes', 'InitialPoison', 'infected_nodes']
 
 class ServerSentEvent(object):
     def __init__(self, data, event_id):
