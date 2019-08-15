@@ -27,6 +27,7 @@ var dynamicGraph = {};
         }
         source.addEventListener('message', function(e) {
           json  = JSON.parse(e.data);
+          console.log(e);
           dynamicGraph.plotGraph(svg, json);
 
           if (Number(e.lastEventId) >= nodes_number ) {
