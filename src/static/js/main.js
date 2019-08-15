@@ -27,7 +27,6 @@ var dynamicGraph = {};
         }
         source.addEventListener('message', function(e) {
           json  = JSON.parse(e.data);
-          console.log(e);
           dynamicGraph.plotGraph(svg, json);
 
           if (Number(e.lastEventId) >= nodes_number ) {
@@ -264,15 +263,13 @@ jQuery(function ($) {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (json) {
-                console.log(json);
                 dynamicGraph.plotGraph(svg, json);
                 if (json.result != 404 && json.deletedNodes > 0 ) {
                     dynamicGraph.show_alert(` ${json.deletedNodes} infected nodes are removed from the graph.`, "success");
                 };
             },
             error: function (xhr, textStatus, errorThrown) {
-                var json = $.parseJSON(xhr.responseText);
-                var errors = json.errors;
+                dynamicGraph.show_alert(`Your Graph Is Empty. Generate A Graph First!`, "warning");
             },
             complete: function () {
             }
